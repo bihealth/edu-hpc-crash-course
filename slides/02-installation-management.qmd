@@ -1,0 +1,354 @@
+---
+title: "HPC Crash Course"
+subtitle: "Software Installation Management"
+
+author:
+  - name: Manuel Holtgrewe
+    orcid: 0000-0002-3051-1763
+    affiliations:
+      - ref: bihealth
+affiliations:
+  - id: bihealth
+    name: Berlin Institute of Health at Charité
+    address: Charitéplatz 1,
+    postal-code: 10117
+    city: Berlin
+    country: Germany
+title-slide-attributes:
+  data-background-size: contain
+  data-background-image: themes/bih/bih_bg_logo.png
+format:
+  revealjs:
+    theme:
+      - default
+      - themes/bih/theme.scss
+    slide-number: true
+    navigation-mode: linear
+    controls-layout: bottom-right
+    controls-tutorial: false
+    smaller: true
+    self-contained: true
+    # Override default "normal" size to get 16:9 aspect ratio.
+    width: 1200
+    height: 675
+    margin: 0.05
+    # Enable local plugins.
+    revealjs-plugins:
+      - plugins/fullscreen
+---
+
+## Session Overview
+
+- Introduction
+- Conda Package Manager
+- Apptainer Container Engine
+
+## Introduction {.inverse background-color="#70ADC1"}
+
+- Why is software installation so hard?
+
+## Software Installation {.even-smaller}
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+A challenge[?]{.fragment .highlight-red}
+Some options:
+
+- By hand: `make install`
+  - [Old-school 📼 💾 📠]{.fragment} [(dependencies 😱)]{.fragment}
+- On your laptop: `sudo apt install`
+  - [⛔ you don't get `root` on the HPC]{.fragment}
+- [Easybuild / environment modules](https://easybuild.io/)
+  - [More old school pain]{.fragment}
+- [Guix](https://guix.gnu.org/)
+  - [🤓 too nerdy(?)]{.fragment}
+:::
+
+::: {.column width="40%"}
+
+![](img/02-installation-management/installer-example.png){width=70%}
+
+- [🐍 Conda](https://docs.conda.io/en/latest/)
+  - [bioconda channel]{.fragment} [👉 bioconda Homepage](http://bioconda.github.io/){.fragment}
+  - [Snakemake support (more of this later)]{.fragment}
+:::
+
+::::
+
+## Conda Package Manager {.inverse background-color="#70ADC1"}
+
+- What is Conda?
+- Installation
+- Environment Management
+- Installing Software
+
+## What is Conda?
+
+> Conda is an open-source, cross-platform, language-agnostic package manager and environment management system.
+
+-- Wikipedia
+
+<hr>
+
+::::: {.incremental}
+
+**Conda allows you to**:
+
+- install [many]{.fragment .highlight-red} [precompiled]{.fragment .highlight-red} packages [on your own]{.fragment .highlight-red}
+- more than 8.5k bioinformatics packages via `bioconda` channel
+- manage [distinct environment]{.fragment .highlight-red}
+  - e.g., separate by project if you want to pin versions
+- Plus, it [integrates well into Snakemake]{.fragment .highlight-red} (more about that later)
+
+:::::
+
+## First Steps: Installation 🤸 (1)
+
+Use the following steps for installation:
+
+```{.bash code-line-numbers="1|2|4|5-6|7|8|9"}
+# on login node
+srun --partition=training --mem=5G --pty bash -i
+
+# on a compute node
+wget -O /tmp/Miniforge3-Linux-x86_64.sh \
+  https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+mkdir -p $HOME/work/miniconda3
+ln -sr $HOME/work/miniconda3 $HOME/miniconda3
+bash /tmp/Miniforge3-Linux-x86_64.sh -s -b -p $HOME/work/miniconda3
+```
+
+Configure:
+
+```{.bash}
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+cat ~/.condarc
+```
+
+## First Steps: Installation 🤸 (2)
+
+Now you can activate it with
+
+```{.bash code-line-numbers="1|2"}
+source ~/miniconda3/bin/activate
+mamba --help
+```
+
+👉 [Mamba User Guide](https://mamba.readthedocs.io/en/latest/user_guide/concepts.html)
+
+## Second Steps: Managing Environments
+
+Creating an environment:
+
+```{.bash}
+mamba create --yes --name read-mapping bwa samtools
+conda activate read-mapping
+## or: source ~/miniconda3/bin/activate read-mapping
+```
+
+Showing what is installed:
+
+```{.bash}
+conda env export | tee env.yaml
+# OUTPUT:
+name: read-mapping
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+
+```
+
+## Second Steps: Installing Software
+
+```{.bash}
+mamba search samtools
+...
+```
+
+```{.bash}
+mamba install -y samtools
+...
+```
+
+## Apptainer {.inverse background-color="#70ADC1"}
+
+- Introduction
+- Running `.sif` files with Apptainer
+- Building `.sif` files from Docker containers
+- Building `.sif` files from scratch
+
+## What is Apptainer?
+
+[Apptainer]{.fragment .highlight-red} (fka Singularity) is a [container system]{.fragment .highlight-red} for [HPC]{.fragment .highlight-red}.
+
+[**What are containers?**]{.fragment .highlight-red}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- Package all software dependencies into one image file.
+- Run the software inside of the image.
+- [Bind-mount]{.fragment .highlight-red} directories into the container.
+
+:::
+
+::: {.column width="50%"}
+
+```{mermaid}
+flowchart TD
+    A[OS User Land] --> B[OS Kernel]
+    C[Apptainer Layer] --> B
+    D[Your app] --> A
+    E[Your Container] --> C
+```
+
+:::
+
+::::
+
+➡️ Reproducible, transferrable, application installations
+
+## Preparations
+
+- Apptainer will download image files to `~/.apptainer`
+- We should move this to somewhere with more space than `$HOME`
+
+```
+$ mkdir -p ~/work/.apptainer
+$ ln -s ~/work/.apptainer ~/.apptainer
+$ ls -lh ~/work | grep apptainer
+lrwxrwxrwx  1 holtgrem_c hpc-ag-cubi   52 Apr 20 08:53 .apptainer -> /data/cephfs-1/home/users/holtgrem_c/work/.apptainer
+```
+
+## Running
+
+Before first run:
+
+```
+$ find ~/.apptainer/
+/data/cephfs-1/home/users/holtgrem_c/.apptainer/
+```
+
+Running (will download and convert Docker image)
+
+```
+$ apptainer run docker://grycap/cowsay Hello World
+INFO:    Converting OCI blobs to SIF format
+INFO:    Starting build...
+<<<many warnings>>>
+INFO:    Creating SIF file...
+ ___________________________
+< To order, call toll-free. >
+ ---------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+```
+
+After run:
+
+```
+$ find ~/.apptainer/
+$HOME/.apptainer/
+...
+$HOME/.apptainer/cache/blob/blobs/sha256/bcc2a6e8c5a73d8b8a4d1a75e68946d7c404b2f32b7574f6e5e0d571bf3537c1
+...
+```
+
+## Converting Docker Image to `.sif` Files
+
+Build it:
+
+```
+$ apptainer build /tmp/cowsay.sif docker://grycap/cowsay
+# INFO:    Starting build...
+Getting image source signatures
+Copying blob d6e911d60d73 skipped: already exists 
+Copying blob 55010f332b04 skipped: already exists 
+Copying blob b6f892c0043b skipped: already exists 
+Copying blob 3deef3fcbd30 skipped: already exists 
+Copying blob cf9722e506aa skipped: already exists 
+Copying blob 2955fb827c94 skipped: already exists 
+Copying config c1634cdfc2 done 
+Writing manifest to image destination
+<<<many warnings>>>
+INFO:    Creating SIF file...
+INFO:    Build complete: /tmp/cowsay.sif
+```
+
+Run it:
+
+```
+$ apptainer run /tmp/cowsay.sif
+ _________________________________________
+/  You will remember, Watson, how the     \
+| dreadful business of the Abernetty      |
+| family was first brought to my notice   |
+| by the depth which the parsley had sunk |
+| into the butter upon a hot day.         |
+|                                         |
+\ -- Sherlock Holmes                      /
+ -----------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+```
+
+Cleanup:
+
+```
+$ rm -rf ~/.apptainer/*
+```
+
+## Building `.sif` Files from Scratch
+
+```
+$ cat lolcow.def
+Bootstrap: docker
+From: ubuntu:16.04
+
+%post
+    apt-get -y update
+    apt-get -y install fortune cowsay lolcat
+
+%environment
+    export LC_ALL=C
+    export PATH=/usr/games:$PATH
+
+%runscript
+    fortune | cowsay | lolcat
+```
+
+Then, build in two-step process (so we don't need `sudo`).
+
+```
+$ apptainer build --sandbox /tmp/lolcow lolcow.def
+$ apptainer build lolcow.sif /tmp/lolcow
+...
+$ apptainer run lolcow.sif
+ ________________________________________
+/ Your temporary financial embarrassment \
+| will be relieved in a surprising       |
+\ manner.                                /
+ ----------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+```
+
+[More here](https://docs.sylabs.io/guides/3.0/user-guide/build_a_container.html)
