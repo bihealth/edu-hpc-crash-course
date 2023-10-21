@@ -1,0 +1,777 @@
+---
+title: "HPC Crash Course"
+subtitle: "Snakemake Workflow Manager"
+
+author:
+  - name: Manuel Holtgrewe
+    orcid: 0000-0002-3051-1763
+    affiliations:
+      - ref: bihealth
+affiliations:
+  - id: bihealth
+    name: Berlin Institute of Health at Charité
+    address: Charitéplatz 1,
+    postal-code: 10117
+    city: Berlin
+    country: Germany
+title-slide-attributes:
+  data-background-size: contain
+  data-background-image: themes/bih/bih_bg_logo.png
+format:
+  revealjs:
+    theme:
+      - default
+      - themes/bih/theme.scss
+    slide-number: true
+    navigation-mode: linear
+    controls-layout: bottom-right
+    controls-tutorial: false
+    smaller: true
+    self-contained: true
+    # Override default "normal" size to get 16:9 aspect ratio.
+    width: 1200
+    height: 675
+    margin: 0.05
+    # Enable local plugins.
+    revealjs-plugins:
+      - plugins/fullscreen
+---
+
+## Session Overview
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+__Aims__
+
+- Understand the need for reproducibility when using computational methods.
+- Learn about the role of workflow managers.
+- Learn to use the Snakemake workflow manager.
+- Use Snakemake together with
+  - Slurm
+  - Conda
+
+:::
+
+::: {.column width=50%}
+
+__Actions__
+
+- Installing and using Snakemake.
+- Writing modular Snakemake workflows.
+- Use Snakemake with Conda for software management and Slurm for execution.
+
+:::
+
+::::
+
+## Reproducibility in Computational Sciences {.inverse background-color="#70ADC1"}
+
+- Reproducibility in General
+- Bioinformatics Reproducibility Issues
+
+## Reproducibility in General
+
+
+:::: {.columns}
+
+::: {.column width=60%}
+
+- **Reproducing** an experiment means that another research gets the same results with the same methodology.
+    - An analysis of published P-values tells us that there are "too many P-values <0.05".
+- We will not cover this topic itself but rather about:
+    - How to ensure that a computational analysis is reproducible.
+    - **Should be simple, right! Right? Right?!**
+
+:::
+
+::: {.column width=40%}
+
+![](img/05-snakemake/ioannidis-reproducibility-crisis.png)
+
+:::
+
+::::
+
+## Bioinformatics Reproducibility Issues
+
+A small selection
+
+- your software
+- other people's software
+- parameters
+- data
+- actual program execution
+
+## Issue: Your Software (1)
+
+- Which exact code did you use to create the results?
+- Relatively easy to fix with source code version control
+    - and some discipline!
+
+## Issue: Other People's Software (2)
+
+- Your code does not exist in a vacuum.
+- You use other people's software.
+    - Libraries (even standard library!)
+    - Interpreter version (or compiler...)
+    - Operating system kernel
+    - Operating system user land
+    - Other software that you run
+
+## Issue: Parameters
+
+- Most probably, your analysis software has parameters
+    - You need to keep track of them
+    - Ideally, you have the scripts for calling them in Git
+    - You should probably also have configuration files in Git
+- When using random numbers, make sure to use seeds for reprodubility
+- "Hidden" parameters
+    - environment variables (e.g., `LANG`)
+    - system / hardware configuration
+
+## Issue: Data
+
+- Keep it save
+    - file permissions
+    - backups
+- Keep integrity
+    - checksums
+- (Of course: keep rights)
+    - ... of researcher
+    - ... of individual (if human)
+
+## Workflow Managers {.inverse background-color="#70ADC1"}
+
+- Introduction
+- Snakemake
+- Nextflow
+- Galaxy
+
+## Introduction
+
+- **Workflow Managers** allow you to describe your analysis as a workflow and execute it
+- Key features / tasks are:
+    - orchestration: select jobs to run and run them
+    - logging: keep logs
+    - continuability: allow to continue after failure / resuming failed jobs etc.
+- There is some overlap with resource managers (e.g., Slurm), but workflow managers are usually more high level
+
+## Snakemake
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+- Python-based workflow manager
+    - you benefit from Python ecosystem and your knowledge
+- Similar to GNU/Unix Make "back to front"
+- Explicit file names / patterns
+:::
+
+::: {.column width=50%}
+
+```snakemake
+# run with `snakemake --cores=1`
+
+rule all:
+  input: "output.pdf"
+
+rule write_md:
+  output: "output.md"
+  shell: "echo '# Hello World' > {output}"
+
+rule md_to_pdf:
+  input: "{name_in}.md"
+  output: "{name_out}.pdf"
+  shell: "pandoc {input} -o {output}"
+```
+
+:::
+
+::::
+
+## Nextflow
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+- runs on the JVM
+- DSL based on Groovy
+    - Groovy is a "kind of Ruby"
+- Based on channels (file-based also possible)
+- Data is by default "hidden" 
+:::
+
+::: {.column width=50%}
+
+```nextflow
+process write_md {
+  output: path 'result.md'
+  script: "echo 'Hello World' > result.md"
+}
+
+process md_to_pdf {
+  input: path "result.md"
+  output: path "result.pdf"
+  script: "pandoc result.md result.pdf"
+}
+
+workflow {
+  foo | md_to_pdf
+}
+```
+
+:::
+
+::::
+
+Won't be covered in this course.
+
+## Galaxy
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+- **Graphical** workflow manager
+- Needs central server installation / cannot be installed by users
+- Not available at BIH HPC
+- 🤡🤡 ["REAL PROGRAMMERS DONT USE GUIs"](https://www.ecb.torontomu.ca/~elf/hack/realmen.html) 🤡🤡
+:::
+
+::: {.column width=50%}
+
+![](img/05-snakemake/galaxy-workflow-editor.png)
+
+:::
+
+::::
+
+## The Snakemake Workflow Manager {.inverse background-color="#70ADC1"}
+
+- Introduction
+- Installation
+- Our First Workflow
+- A Real Workflow
+
+## Introduction
+
+![](img/05-snakemake/snakemake-idea.png)
+
+- Snakemake: [Documentation](https://snakemake.readthedocs.io/en/stable/) | [Tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html) | [Discord Chat](https://discord.gg/NUdMtmr) | [Stack Overflow](https://stackoverflow.com/questions/tagged/snakemake)
+- Integrates well with Conda, Slurm, Singularity
+
+## Installation
+
+Quite straightforward ;-)
+
+```
+mamba create -y -n snake-pit python=3.10 snakemake
+conda activate snake-pit
+```
+
+## Our First Workflow (1)
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+```snakemake
+rule all:
+  input: "A.pdf", "B.pdf", "C.pdf"
+
+rule write_md_a:
+  output: "A.md"
+  shell: "echo '# A' > A.md"
+
+rule write_md_b:
+  output: "B.md"
+  shell: "echo '# B' > B.md"
+
+rule write_md_c:
+  output: "C.md"
+  shell: "echo '# C' > C.md"
+```
+
+:::
+
+::: {.column width=50%}
+
+```snakemake
+rule convert_md_a:
+  input: "A.md"
+  output: "A.pdf"
+  shell: "pandoc A.md A.pdf"
+
+rule convert_md_b:
+  input: "B.md"
+  output: "B.pdf"
+  shell: "pandoc B.md B.pdf"
+
+rule convert_md_c:
+  input: "C.md"
+  output: "C.pdf"
+  shell: "pandoc C.md C.pdf"
+```
+
+:::
+
+::::
+
+## Our First Workflow (2)
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+```snakemake
+rule all:
+  input: "A.pdf", "B.pdf", "C.pdf"
+
+rule write_md_a:
+  output: "A.md"
+  shell: "echo '# A' > {output}"
+
+rule write_md_b:
+  output: "B.md"
+  shell: "echo '# B' > {output}"
+
+rule write_md_c:
+  output: "C.md"
+  shell: "echo '# C' > {output}"
+```
+
+:::
+
+::: {.column width=50%}
+
+```snakemake
+rule convert_md_a:
+  input: "A.md"
+  output: "A.pdf"
+  shell: "pandoc {input} {output}"
+
+rule convert_md_b:
+  input: "B.md"
+  output: "B.pdf"
+  shell: "pandoc {input} {output}"
+
+rule convert_md_c:
+  input: "C.md"
+  output: "C.pdf"
+  shell: "pandoc {input} {output}"
+```
+
+:::
+
+::::
+
+... using `{input}` and `{output}`
+
+## Our First Workflow (3)
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+```snakemake
+rule all:
+  input: "A.pdf", "B.pdf", "C.pdf"
+
+rule write_md:
+  output: "{name}.md"
+  shell: "echo '# {wildcards.name}' > {output}"
+```
+
+:::
+
+::: {.column width=50%}
+
+```snakemake
+rule convert_md:
+  input: "{name}.md"
+  output: "{name}.pdf"
+  shell: "pandoc {input} {output}"
+```
+
+:::
+
+::::
+
+... using wildcards
+
+## Our First Workflow (4)
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+```snakemake
+rule all:
+  input: "A.pdf", "B.pdf", "C.pdf"
+
+rule write_md:
+  output: md="{name}.md"
+  shell: "echo '# {wildcards.name}' > {output.md}"
+```
+
+:::
+
+::: {.column width=50%}
+
+```snakemake
+rule convert_md:
+  input: md="{name}.md"
+  output: md="{name}.pdf"
+  shell: "pandoc {input.md} {output.md}"
+```
+
+:::
+
+::::
+
+- using named input/output
+- NB: `{input}` and `{output}` are still available and will list all file names
+
+## Our First Workflow (5)
+
+:::: {.columns}
+
+::: {.column width=50%}
+
+```snakemake
+output_files = [f"{name}" for name in ["A", "B", "C"]]
+
+rule all:
+  input: output_files
+
+rule write_md:
+  output: md="{name}.md"
+  shell: "echo '# {wildcards.name}' > {output.md}"
+```
+
+:::
+
+::: {.column width=50%}
+
+```snakemake
+rule convert_md:
+  input: md="{name}.md"
+  output: md="{name}.pdf"
+  shell: "pandoc {input.md} {output.md}"
+```
+
+:::
+
+::::
+
+- demonstrating to get output file names from a list
+- `output_files` could also have been generated by reading a sample sheet
+
+## A Real Workflow (1)
+
+```snakemake
+REF = "static/hs38.fasta"
+
+rule output:
+  input: "case_1.bam"
+
+rule map_reads:
+  input:
+    left="input/{sample}_R1.fastq.gz",
+    right="input/{sample}_R2.fastq.gz",
+  output:
+    bam="output/{sample}.bam",
+  shell:
+    r"""
+    seqtk mergpe {input.left} {input.right} \
+    | bwa mem -t 4 -R "@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}" \
+      {REF} - \
+    | samblaster -M \
+    | samtools sort -O BAM -o {output.bam}
+    """
+```
+
+## A Real Workflow (2)
+
+```snakemake
+REF = "static/hs38.fasta"
+
+rule output:
+  input: "output/case_1.bam"
+
+rule map_reads:
+  input:
+    left="input/{sample}_R1.fastq.gz",
+    right="input/{sample}_R2.fastq.gz",
+  output:
+    bam="output/{sample}.bam",
+  threads: 32,
+  shell:
+    r"""
+    seqtk mergpe {input.left} {input.right} \
+    | bwa mem -t {threads} -R "@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}" \
+      {REF} - \
+    | samblaster -M \
+    | samtools sort -O BAM -o {output.bam}
+    """
+```
+
+## A Real Workflow (3)
+
+```snakemake
+config: "config.yaml"
+
+rule output:
+  input: [f"output/{sample}.bam" for sample in config.samples]
+
+rule map_reads:
+  input:
+    left="input/{sample}_R1.fastq.gz",
+    right="input/{sample}_R2.fastq.gz",
+  output:
+    bam="output/{sample}.bam",
+  shell:
+    r"""
+    seqtk mergpe {input.left} {input.right} \
+    | bwa mem -t {config.map_threads} -R "@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}" \
+      {REF} - \
+    | samblaster -M \
+    | samtools sort -@ {config.sort_threads} -O BAM -o {output.bam}
+    """
+```
+
+config.yaml
+
+```
+ref: "static/hs38.fasta"
+map_threads: 32
+sort_threads: 4
+samples:
+  - case_1
+  - case_2
+```
+
+## A Real Workflow (4)
+
+
+```snakemake
+config: "config.yaml"
+
+rule output:
+  input: [f"output/{sample}.bam" for sample in config.samples]
+
+rule map_reads:
+  input:
+    left="input/{sample}_R1.fastq.gz",
+    right="input/{sample}_R2.fastq.gz",
+  output:
+    bam="output/{sample}.bam",
+  threads: config.map_threads
+  resources:
+    mem_mb=16*1024,
+    runtime=24*60,  # in minutes == 1day
+  shell:
+    r"""
+    seqtk mergpe {input.left} {input.right} \
+    | bwa mem -t {config.map_threads} -R "@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}" \
+      {REF} - \
+    | samblaster -M \
+    | samtools sort -@ {config.sort_threads} -O BAM -o {output.bam}
+    """
+```
+
+(same config.yaml)
+
+## A Real Workflow (5)
+
+```snakemake
+config: "config.yaml"
+
+rule output:
+  input: [f"output/{sample}.bam" for sample in config.samples]
+
+rule map_reads:
+  input:
+    left="input/{sample}_R1.fastq.gz",
+    right="input/{sample}_R2.fastq.gz",
+  output:
+    bam="output/{sample}.bam",
+  threads: config.map_threads
+  resources:
+    mem_mb=16*1024,
+    runtime=24*60,  # in minutes == 1day
+  shell:
+    r"""
+    export TMPDIR=$(mktemp -d)
+    trap "rm -rf $TMPDIR" EXIT
+
+    seqtk mergpe {input.left} {input.right} \
+    | bwa mem -t {config.map_threads} -R "@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}" \
+      {REF} - \
+    | samblaster -M \
+    | samtools sort -T $TMPDIR/tmp -@ {config.sort_threads} -O BAM -o {output.bam}
+    """
+```
+
+- with explicit temporary file handling / cleanup
+
+## A Real Workflow (7)
+
+```snakemake
+config: "config.yaml"
+
+rule output:
+  input: [f"output/{sample}.bam" for sample in config.samples]
+
+rule map_reads:
+  input:
+    left="input/{sample}_R1.fastq.gz",
+    right="input/{sample}_R2.fastq.gz",
+  output:
+    bam="output/{sample}.bam",
+  threads: config.map_threads
+  resources:
+    mem_mb=16*1024,
+    runtime=24*60,  # in minutes == 1day
+  wildcard_constraints:
+    sample=r"[A-Za-z0-9_\-]+",
+  shell:
+    r"""
+    export TMPDIR=$(mktemp -d)
+    trap "rm -rf $TMPDIR" EXIT
+
+    seqtk mergpe {input.left} {input.right} \
+    | bwa mem -t {config.map_threads} -R "@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}" \
+      {REF} - \
+    | samblaster -M \
+    | samtools sort -T $TMPDIR/tmp -@ {config.sort_threads} -O BAM -o {output.bam}
+    """
+```
+
+- with wildcard constraint to avoid problems with file names
+
+## A Real Workflow (8)
+
+In the `Snakefile`
+
+```
+rule map_reads:
+  conda: "envs/map_reads.yaml"
+```
+
+`envs/map_reads.yaml`:
+
+```yaml
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bwa ==0.7.17
+  - samtools =1.16
+  - samblaster ==0.1.26
+  - seqtk ==1.3
+```
+
+## Now, as for running locally
+
+- run locally with given number of cores
+
+  ```
+  $ ls
+  Snakefile
+  config.yaml
+  intput/
+  $ snakemake --cores=32 output/case_1.bam
+  ```
+
+  (this will not enforce threads or memory)
+
+## To run on the HPC ...
+
+- We need to use the Slurm runner
+- We can set default resources, partition, etc.
+- It is up to Slurm to enforce threads / memory using cgroups
+
+```
+$ snakemake --jobs=4 --slurm \
+    --default-resources slurm_partition=long \
+    output/case_1.bam
+```
+
+- Logs will go into `.snakemake/slurm_logs/rule_RULE_NAME/JOBID.log`
+
+## Input Functions
+
+You can also put functions as inputs:
+
+```
+def foo_input(wildcards):
+  sample_upper wildcards.sample.upper()
+  return f"input/{sample_upper}.fastq.gz"
+
+rule foo:
+  input: foo_input
+```
+
+If you want to return named input files, use `unpack()`
+
+```
+def foo_input(wildcards):
+  sample_upper wildcards.sample.upper()
+  return {
+    "left": f"input/{sample_upper}_1.fastq.gz",
+    "right": f"input/{sample_upper}_1.fastq.gz",
+  }
+
+rule foo:
+  input: unpack(foo_input)
+  script:
+    r"""
+    # ...
+    seqtk mergepe {input.left} {input.right} \
+    # ...
+    """
+```
+
+## Dynamic Resources
+
+Similarly, the resources can be a callable as well:
+
+```snakemake
+def foo_threads(wildcards, input):
+  return random.choice([23, 42])
+
+def foo_resources(wildcards, input, threads, attempt):
+  # give 20% more resources per attempt
+  multiplier = 1 + 0.2 * (attempt - 1)
+  return {
+    "mem_mb": 1024 * threads * multiplier,
+    "runtime": 60 * 60 * 24 * multiplier,
+  }
+
+rule foo:
+  threads: threads
+  resources: foo_resources
+```
+
+## Bring Your Own Project {.inverse background-color="#70ADC1"}
+
+🫵 Where can you apply what you have learned in your PhD project?
+
+## This is not the end...
+
+... but all for this session
+
+__Recap__
+
+- Reproducibility
+  - Challenges and resolution approaches
+  - The role of workflow managers
+- Snakemake
+  - Writing modular `Snakefile`s
+  - Using Snakemake with conda for reproducible software installations
+  - Using Snakemaek with Slurm for scaling up your workflows
