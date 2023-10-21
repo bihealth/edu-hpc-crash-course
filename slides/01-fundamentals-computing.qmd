@@ -37,6 +37,11 @@ format:
       - plugins/fullscreen
 ---
 
+## Welcome {.inverse background-color="#70ADC1"}
+
+- Course Overview
+- Aims, Scope, Non-Aims, Out-of-Scope
+
 ## Course Overview
 
 - Welcome to the course! 👋
@@ -53,9 +58,44 @@ format:
 - Instructor: Manuel Holtgrewe
 - Contact Information: manuel.holtgrewe@bih-charite.de
 
-## Interactivity
+## User Engagement
 
-```{=html}
-<iframe width="780" height="500" src="https://quarto.org/" title="Quarto Documentation"></iframe>
-```
+- We are a large group today.
+- We will use PollEverywhere for
+    - quizes for "Lernerfolgskontrolle"
+    - questions and answers
+- Let's try: [PollEv.com/manuelholtgrewe153](https://PollEv.com/manuelholtgrewe153)
 
+## The Sheep Scale
+
+![](img/01-fundamentals-computing/sheep-scale.png){width=100%, fig-align=center}
+
+## Course Aims and Scope
+
+- Basic understanding of HPC
+- Some theory to understand issues occuring in practice
+- How to help yourself in case of troubleshooting
+- Install software (conda, apptainer/singularity)
+- Tips and sleight of hand for improved productivity
+
+... and maybe
+
+- Connect "birds of a feather" to later share experience, e.g., on project organisation
+
+## Course Non-Aims and Out-of-Scope
+
+- Advanced OnDemand Portal usage
+- (Linux) command line basics
+- Programming basics
+- Scientific programming, e.g., machine learning, statistics, visualization, parameter fitting, polars, ...
+- Bioinformatics (variant/gene expression/... analysis)
+- Networking issues with Charite or MDC/MAX
+- Advanced Snakemake usage, reproducibility, ...
+
+## Course Outline
+
+1. Fundamentals: Computing
+2. Fundamentals: HPC
+3. Software Installation Management
+4. Slurm Workload Manager
+5. Snakemake for Workflows
