@@ -101,7 +101,7 @@ format:
 1. Fundamentals: Computing
 2. Software Installation Management
 3. Fundamentals: HPC
-4. Slurm Workload Manager
+4. Slurm Resource Manager
 5. Snakemake for Workflows
 
 ## Fundamentals: Computing {.inverse background-color="#70ADC1"}
