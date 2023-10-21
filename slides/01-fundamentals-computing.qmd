@@ -70,6 +70,10 @@ format:
 
 ![](img/01-fundamentals-computing/sheep-scale.png){width=100%, fig-align=center}
 
+## Who are you?
+
+![](img/01-fundamentals-computing/tree-of-life.svg){width=100%, fig-align=center}
+
 ## Course Aims and Scope
 
 - Basic understanding of HPC
@@ -95,7 +99,145 @@ format:
 ## Course Outline
 
 1. Fundamentals: Computing
-2. Fundamentals: HPC
-3. Software Installation Management
+2. Software Installation Management
+3. Fundamentals: HPC
 4. Slurm Workload Manager
 5. Snakemake for Workflows
+
+## Fundamentals: Computing {.inverse background-color="#70ADC1"}
+
+- Session Overview
+
+## Session Overview
+
+- (The world according to) the operating system (OS)
+    - user space, kernel space, pid, uid, gid, cwd, oh my!
+    - A dive into memory management
+    - The "file" abstraction
+    - Processes, threads, and the Python GIL
+- Computer networks
+    - Some fundamentals
+    - The secret life of the secure shell (SSH)
+
+## The Operating System (OS) {.inverse background-color="#70ADC1"}
+
+- Basic Process Properties
+- User Space, Kernel Space, and System Calls
+- OS Memory Management
+- The "File" Abstraction
+- Processes, Threads, and the Python GIL
+
+**Note: simplified treatment of the subject only**
+
+## Basic Process Properties
+
+::::: {.columns}
+
+:::: {.column width="50%" .incremental}
+- running programs are **processes**
+    - `bash` launched via `ssh`
+    - `bash` launched via `srun`
+    - `python`, `conda`, `vim`, ...
+- each process has...
+    - properties such as PID and others
+    - its own memory space
+    - list of open files
+::::
+
+:::: {.column width="50%"}
+
+::: {.fragment}
+
+**(some) process properties**
+
+- `pid` - process ID
+- `uid` - numeric user ID
+- `gid` - (effective) group ID
+- `umask` - default mode for new files
+- `cwd` - current working directory
+
+:::
+
+::: {.fragment}
+
+**limits**
+
+- virtual memory
+- open files
+- max processes
+::::
+
+:::
+
+:::::
+
+## User Space, Kernel Space
+
+![](img/01-fundamentals-computing/linux-user-kernel.svg){width=100%, fig-align=center}
+
+## Linux Memory Layout
+
+![Source: Computer Systems: A Programmer's Perspective, 3/E (CS:APP3e)](img/01-fundamentals-computing/linux-memory-layout.png)
+
+## Virtual and Physical Memory Layout
+
+![Source: Wikipedia - Page Table](img/01-fundamentals-computing/page-table.svg)
+
+## Memory Managment Takeaways
+
+:::::  {.incremental}
+
+- Each process has its own, isolated, virtual memory
+- The **kernel** is responsible for
+  - mapping between virtual and physical memory
+  - allocating and tracking virtual memory
+- The **user space** program
+  - only operates on virtual memory
+  - can only move the `brk` pointer to (de)allocate memory
+  - implements its own management **within** virtual memory
+- **Resident memory** is virtual memory that is
+  - actually mapped (and not swapped out)
+
+:::::
+
+##  Memory Management Takeaways (2)
+
+:::::  {.incremental}
+
+- Memory management is a **complex** topic! 🙉🙊🙊
+- Most of you ... 
+    - either call C programs from Bash ... 
+    - or use a language with garbage collection (Python, R, Java, etc.) ... 
+- ... and should probably not worry too much about it.
+    - beware of memory leaks (and "leaks"), though!
+- Try to learn some best practices now and return once you have issues.
+    - Premature optimization is the root of all evil. - Donald Knuth
+- **We will cover memory again with respect to Slurm.**
+
+:::::
+
+## The "File" Abstraction
+
+:::::  {.incremental}
+
+- In Unix systems, everything is a file
+    - directories, devices, sockets, ...
+    - **GPUs**
+- Pro tip: Learn how to use `umask`!
+
+:::::
+
+## Processes, Threads
+
+![Source: https://dev.to/hrishi2710/threading-in-operating-system-3gjb](img/01-fundamentals-computing/processes-threads.jpg)
+
+## The Python GIL (1)
+
+![Source: https://twitter.com/StepFor40691082/status/1269101158561431557S](img/01-fundamentals-computing/python-gil.jpg)
+
+## The Python GIL (2)
+
+- Global Interpreter Lock implications:
+    - multithreading only useful for I/O-bound tasks (**concurrency**)
+    - for **parallel** computation, use `multiprocessing`
+    - we will see an example in "Fundamentals: HPC"
