@@ -1,0 +1,9 @@
+/slides.OLD
+
+*:Zone.Identifier
+
+.*.sw?
+*~
+
+*.html
+*/*_files/*

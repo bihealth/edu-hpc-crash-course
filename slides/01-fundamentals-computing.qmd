@@ -1,0 +1,61 @@
+---
+title: "HPC Crash Course"
+subtitle: "Fundamentals in Computing & init()"
+
+author:
+  - name: Manuel Holtgrewe
+    orcid: 0000-0002-3051-1763
+    affiliations:
+      - ref: bihealth
+affiliations:
+  - id: bihealth
+    name: Berlin Institute of Health at Charité
+    address: Charitéplatz 1,
+    postal-code: 10117
+    city: Berlin
+    country: Germany
+title-slide-attributes:
+  data-background-size: contain
+  data-background-image: themes/bih/bih_bg_logo.png
+format:
+  revealjs:
+    theme:
+      - default
+      - themes/bih/theme.scss
+    slide-number: true
+    navigation-mode: linear
+    controls-layout: bottom-right
+    controls-tutorial: false
+    smaller: true
+    self-contained: true
+    # Override default "normal" size to get 16:9 aspect ratio.
+    width: 1200
+    height: 675
+    margin: 0.05
+    # Enable local plugins.
+    revealjs-plugins:
+      - plugins/fullscreen
+---
+
+## Course Overview
+
+- Welcome to the course! 👋
+- Introduction to High-Performance Computing (HPC)
+- Focus on biomedical and medical research applications
+
+::: {.center-h}
+🔬 ⌨️ 🧬
+:::
+
+. . .
+
+- Duration: ~~5 days~~ 5 x 45 min
+- Instructor: Manuel Holtgrewe
+- Contact Information: manuel.holtgrewe@bih-charite.de
+
+## Interactivity
+
+```{=html}
+<iframe width="780" height="500" src="https://quarto.org/" title="Quarto Documentation"></iframe>
+```
+
