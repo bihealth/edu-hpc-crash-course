@@ -86,6 +86,16 @@ format:
 
 - Connect "birds of a feather" to later share experience, e.g., on project organisation
 
+## Prerequisites 🎓
+
+__You should have experience with...__
+
+- ... the Linux operating system 🐧
+- ... the Bash shell (interactive, scripting) 🐚
+- ... using the Secure Shell (SSH) 🛡️
+- ... one programming language (ideally: Python 🐍)
+- ... (some exposure to) scientific programming / machine learning
+
 ## Course Non-Aims and Out-of-Scope
 
 - Advanced OnDemand Portal usage
