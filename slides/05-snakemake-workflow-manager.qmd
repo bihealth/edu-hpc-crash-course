@@ -758,20 +758,6 @@ rule foo:
   resources: foo_resources
 ```
 
-## Bring Your Own Project {.inverse background-color="#70ADC1"}
+## Quiz Time!
 
-🫵 Where can you apply what you have learned in your PhD project?
-
-## This is not the end...
-
-... but all for this session
-
-__Recap__
-
-- Reproducibility
-  - Challenges and resolution approaches
-  - The role of workflow managers
-- Snakemake
-  - Writing modular `Snakefile`s
-  - Using Snakemake with conda for reproducible software installations
-  - Using Snakemaek with Slurm for scaling up your workflows
+- https://PollEv.com​/manuelholtgrewe153
