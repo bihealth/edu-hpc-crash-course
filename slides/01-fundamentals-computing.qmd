@@ -235,11 +235,22 @@ __You should have experience with...__
     - **GPUs**
 - Pro tip: Learn how to use `umask`!
 
+```
+-rw-------  1 holtgrem_c hpc-ag-cubi  142K Oct 23 11:08 .bash_history
+-rw-r-----  1 holtgrem_c hpc-ag-cubi    18 Aug 23  2016 .bash_logout
+-rw-r-----  1 holtgrem_c hpc-ag-cubi   215 Jul 21  2022 .bash_profile
+lrwxrwxrwx  1 holtgrem_c hpc-users      16 Jan 12  2023 .bashrc -> .dotfiles/bashrc
+```
+
 :::::
 
 ## Processes, Threads
 
 ![Source: https://dev.to/hrishi2710/threading-in-operating-system-3gjb](img/01-fundamentals-computing/processes-threads.jpg)
+
+## Time Slicing
+
+![Source: https://commons.wikimedia.org/wiki/File:CpuTimeonSingleCpuMultiTaskingSystem.svg](img/01-fundamentals-computing/cpu-time-slicing.svg)
 
 ## The Python GIL (1)
 
@@ -251,3 +262,45 @@ __You should have experience with...__
     - multithreading only useful for I/O-bound tasks (**concurrency**)
     - for **parallel** computation, use `multiprocessing`
     - we will see an example in "Fundamentals: HPC"
+
+## Secure Shell
+
+![](img/01-fundamentals-computing/ssh-connection-keys.svg)
+
+## Demo Time!
+
+... feel free to type along and learn some sleight of hand
+
+::::: {.columns}
+
+:::: {.column width="50%" .fragment}
+
+**beginners: ascend!**
+
+- master the Bash!
+  - Ctrl-R
+  - `history`
+- `tmux` or `screen`
+- `nano` or `vim`
+  - **NO VS Code on the Login node!**
+- `git`
+- `grep`, `find`, `tar`, `xargs`, ...
+- `man` <-- your friend
+
+::::
+
+:::: {.column width="50%" .fragment}
+
+**intermediates: ascend!**
+
+- `vim`!
+- `~/.bashrc`
+  - `alias`es
+  - be careful, and don't hurt yourself
+  - `ssh $HOST /usr/bin/bash --noprofile --norc`
+- bash scripting
+- `awk`, `sed`, `perl`, ...
+
+::::
+
+:::::
