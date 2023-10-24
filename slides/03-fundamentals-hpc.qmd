@@ -44,7 +44,6 @@ format:
 ## What is High-Performance Computing? {.inverse background-color="#70ADC1"}
 
 - Attempt at a definition
-- Role of HPC in biomedical and medical research
 - Trade-Offs
 
 ## Attempt at a Definition: HPC ...
@@ -57,18 +56,6 @@ format:
 - systems consist of [multiple computing nodes]{.fragment .highlight-red} connected through a [high-speed network]{.fragment .highlight-red}, [working together]{.fragment .highlight-red}
 - enables [researchers]{.fragment .highlight-red} to tackle [computationally intensive tasks]{.fragment .highlight-red} that would be infeasible or too time-consuming otherwise
 - finds applications in a [wide range of fields]{.fragment .highlight-red}, including scientific research, engineering, data analytics, and machine learning
-
-:::
-
-## HPC in Biomedical Research
-
-::: {.incremental}
-
-- ... plays a crucial role by enabling tackling of computational challenges
-- ... allows for analyzing large-scale genomics, proteomics, ..., datasets
-    - leading to insights into diseases and potential treatments
-- ... facilitates simulations such as protein folding, molecule interactions, etc.
-- ... enables the efficient training of large-scale statistical and machine learning models
 
 :::
 
@@ -105,92 +92,11 @@ __Drawbacks__
 
 There is no free lunch!
 
-## What is Your Take? 🤸
-
-::: {.box-top-right .inverse}
-
-__"Blitzlicht" 📸__
-
-- answer one of the questions
-- do not repeat a previous answer
-
-:::
-
-__So far__
-
-- have you benefited from advantages?
-- have you suffered from drawbacks?
-
-__From here on__
-
-- what do you hope to gain from using HPC?
-- what risks do you see?
-
 ## Programming HPC Systems  {.inverse background-color="#70ADC1"}
 
-- There is no Magic or Silver Bullet
 - Common Paradigms for Parallel Programing
 
 ⚠️ "Warning": just a quick and superficial overview ;-)
-
-## There Is No Magic (1)
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-![](img/03-fundamentals-hpc/wikipedia-cray-1.jpeg){width="100%"}
-
-Cray-1 1976 @80Mhz [Wikipedia](https://en.wikipedia.org/wiki/History_of_supercomputing#/media/File:Cray-1-deutsches-museum.jpg)
-
-:::
-
-::: {.column width="50%"}
-
-![](img/03-fundamentals-hpc/wikipedia-blue-gene.jpeg){width="100%"}
-
-IBM Blue Gene ~2000-2015 [Wikipedia](https://en.wikipedia.org/wiki/History_of_supercomputing#/media/File:IBM_Blue_Gene_P_supercomputer.jpg)
-
-**"Just a (large) bunch of computers with fast interconnect."**
-
-:::
-
-::::
-
-## There Is No Magic (2)
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-- From the perspective of 1976, your smartphone is a supercomputer.
-- iPhone 14
-    - ~1,000EUR
-    - 6 cores @3.23Ghz; 6GB RAM
-    - GPU: 5-core GPU
-    - "Neural Engine": 15.8TOPs
-
-:::
-
-::: {.column width="50%"}
-
-- 2002 NEC Earth Simulator
-    - 412,000,000EUR (2023; inflation corrected)
-    - 36TFLOPs
-- 1976 Cray-1
-    - 24,623,570EUR (2023; inflation corrected)
-    - 160MFLOPS
-
-:::
-
-::::
-
-## There Is No Magic (3)
-
-- Is it easy to program an iPhone?
-    - "yes and no"
-- Is it easy to program for an HPC?
-    - "yes and no"
 
 ## "Es gibt keinen Königsweg" (1)
 
@@ -333,7 +239,6 @@ IBM Blue Gene ~2000-2015 [Wikipedia](https://en.wikipedia.org/wiki/History_of_su
 ## HPC Systems and Architecture  {.inverse background-color="#70ADC1"}
 
 - Compute nodes
-- Shared memory vs. distributed memory systems
 - Cluster architecture
 - Distributed file systems
 - Job schedulers and resource management
@@ -394,67 +299,6 @@ More differences from "consumer-grade" hardware:
 no root/admin access, no `sudo`
 :::
 
-## Shared vs. Distributed Memory {.even-smaller}
-
-::::: {.incremental}
-
-:::: {.columns}
-
-::: {.column width="50%"}
-__Shared Memory__
-
-- in-core/multi-threading
-
-```{mermaid}
-graph BT
-    sq1[thread 1] --> ci(memory address)
-    sq2[thread 2] --> ci(memory address)
-```
-
-- ➕ low overhead
-- ➕ easy to get started
-- ➖ implicit communication, easy to make errors
-- ➖ do you __really__ understand your memory model?
-
-:::
-
-::: {.column width="50%"}
-__Distributed Memory__
-
-- out-of-core/message-passing
-
-```{mermaid}
-graph LR
-    sq1[thread 1] -->|How are you?| sq2[thread 2]
-    sq2[thread 2] -->|- fine, thank!| sq1[thread 1]
-```
-
-- ➕ explicit communication, fewer wrong assumptions(?)
-- ➕ model scales up better for larger systems
-- ➖ harder to get started
-- ➖ more complex primitives
-
-:::
-
-::::
-
-:::::
-
-## Your Experience? 🤸
-
-::: {.box-top-right .inverse}
-
-__"Blitzlicht" 📸__
-
-- answer one of the questions
-- do not repeat a previous answer
-
-:::
-
-- have you used shared/distributed<br>
-  memory parallelism before?
-- what is your experience/hope?
-
 ## Cluster Architecture
 
 :::: {.columns}
@@ -479,80 +323,6 @@ __"Blitzlicht" 📸__
 
 ::::
 
-## (Distributed) File Systems
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-- directory/files correspond to **inode**
-    - inode: **fixed-size** data store
-- special inodes such as root directory
-    - "it's all inodes from there"
-- large directories:
-    - indirection
-    - OS must scan all indirect blocks for an `ls`
-
-- More? [Ext4 Disk Layout](https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout)
-
-:::
-
-::: {.column width="50%"}
-
-![](img/03-fundamentals-hpc/inode-structure-wikipedia.svg){width="100%"}
-
-[Source: Wikipedia](https://commons.wikimedia.org/wiki/File:Ext2-inode.svg)
-
-:::
-
-::::
-
-## Distributed File Systems (2)
-
-__"Same-same (as your laptop), but different."__
-
-- POSIX file system
-  - laptop: ext4/XFS/btrfs/ZFS/...
-  - distributed: CephFS, GPFS/SpectrumScale, BeeGFS, ...
-- POSIX guarantees
-  - `sync()` &rarr; visible everywhere
-  - `mkdir`/`open()` &rarr; visible everywhere
-  - files can be opened by multiple processes
-- ... harder to enforce in a distributed (multi-node) setting
-
-## Distributed File Systems (3)
-
-**Best Practices / Do's & Don'ts**
-
-- use modest sized directories (<10k entries)
-  - don't create one file per gene (or similar)
-  - create sub directories, e.g., `abcdef` &rarr; `ab/cdef`
-- don't splurge in file count
-  - don't create one file per NGS read (or similar)
-- avoid recursive traversal of large structures
-  - `ls -lR` will be slow!
-
-## Distributed File Systems (4)
-
-**Best Practices / Do's & Don'ts**
-
-- avoid small reads/writes and random access
-  - each I/O operation (IOP) needs to go through the network
-  - I/O systems are better at handling larger/sequential reads/writes
-- **DO** stream through your files
-  - `for each line/record in file: # do work`
-- **DO** use Unix `sort`
-- **DO** use Unix pipelines rather than temporary files
-  - e.g., `seqtk mergepe R1.fq R2.fq | bwa mem ref.fa | samtools sort | samtools view -O out.bam`
-
-## Distributed File Systems (6)
-
-**Best Practices / Do's & Don'ts**
-
-- **DON'T** be afraid of large files
-    - 1GB does not qualify as large
-    - 1TB files ... do
-
 ## Job Scheduler and Resource Management
 
 ```{mermaid}
@@ -568,17 +338,32 @@ sequenceDiagram
     Compute Node-)+Scheduler: job complete
 ```
 
+## HPC Pitfalls {.inverse background-color="#70ADC1"}
 
-## Last but not least... {.inverse background-color="#70ADC1"}
+- File System Quotas
+- Killed out of Memory
 
-We should make sure that you have access to the HPC system...
+## File System Quotas
 
-## Connecting to the HPC
+- Your `home` volume has tight quotas
+- Some programs will write a lot there
+- Solution: use `work` volume
+  ```
+  NAME=.cpan
+  mkdir -p work/$NAME
+  mv $NAME/* work/$NAME
+  rmdir $NAME
+  ln -sr work/$NAME $NAME
+  ```
+- E.g., run the above `for NAME in ondemand miniconda3 R Downloads .apptainer .theano .singularity .npm .nextflow .local .debug .cpan .cache .aspera`
 
-- Windows Users
-  - Should follow the [hpc-docs instructions](https://hpc-docs.cubi.bihealth.org/connecting/ssh-client-windows/)
-- Linux / Mac Users
-  - Should be able to do `ssh -l $USER_{c,m} hpc-login-1.cubi.bihealth.org
+## Killed Out Of Memory Jobs
+
+- If you get random `Killed` messages, your job probably needs more memory than available
+- In particular:
+    - On login nodes, you only have 100MB of RAM!
+- Solution: request more memory!
+    - More on this in the Slurm session
 
 ## Python Multiprocessing {.inverse background-color="#70ADC1"}
 
@@ -717,30 +502,3 @@ __Placeholders__
 :::
 
 ::::
-
-## HPC Pitfalls {.inverse background-color="#70ADC1"}
-
-- File System Quotas
-- Killed out of Memory
-
-## File System Quotas
-
-- Your `home` volume has tight quotas
-- Some programs will write a lot there
-- Solution: use `work` volume
-  ```
-  NAME=.cpan
-  mkdir -p work/$NAME
-  mv $NAME/* work/$NAME
-  rmdir $NAME
-  ln -sr work/$NAME $NAME
-  ```
-- E.g., run the above `for NAME in ondemand miniconda3 R Downloads .apptainer .theano .singularity .npm .nextflow .local .debug .cpan .cache .aspera`
-
-## Killed Out Of Memory Jobs
-
-- If you get random `Killed` messages, your job probably needs more memory than available
-- In particular:
-    - On login nodes, you only have 100MB of RAM!
-- Solution: request more memory!
-    - More on this in the Slurm session
