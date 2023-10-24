@@ -109,9 +109,9 @@ __Job Scheduler__
 
 ## Our First Interactive Job: Submission 🎬
 
-```{.bash code-line-numbers="1|2-3|4"}
-holtgrem_c@hpc-login-1$ srun --pty --time=2:00:00 --partition=training \
-    --mem=10G --cpus-per-task=1 bash -i
+```{.bash code-line-numbers="1-2|3|4"}
+holtgrem_c@hpc-login-1$ srun --pty --time=2:00:00 --partition=short \
+    --reservation=hpc-crash-course --mem=10G --cpus-per-task=1 bash -i
 srun: job 14629328 queued and waiting for resources
 srun: job 14629328 has been allocated resources
 holtgrem_c@hpc-cpu-141$
@@ -119,8 +119,9 @@ holtgrem_c@hpc-cpu-141$
 
 - start interactive job with `srun`
   - [--pty]{.fragment .highlight-red} connects the job's standard output and error streams to your shell
-  - [--time=2:00:00]{.fragment .highlight-red} makes your job last up to two hours
-  - [--partition=training]{.fragment .highlight-red} submits into the **training** partition
+  - [--time=2:00:00]{.fragment .highlight-red} makes your job run up to two hours
+  - [--partition=short]{.fragment .highlight-red} submits into the **short** partition
+  - [--reservation=hpc-crash-course]{.fragment .highlight-red} submits into the **hpc-crash-course** reservation
   - [--mem=10G]{.fragment .highlight-red} allocates 10GB of RAM to your job
   - [--cpus-per-task=1]{.fragment .highlight-red} allocates one thread for our task
   - [bash -i]{.fragment .highlight-red} is the command to run ([**interactive bash**]{.fragment .highlight-red})
@@ -135,7 +136,7 @@ What is the output of `squeue`?
 ```{.bash code-line-numbers="1|2-3"}
 holtgrem_c@hpc-cpu-141$ squeue -u $USER
    JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-14629328  training     bash holtgrem  R       1:40      1 hpc-cpu-141
+14629328  short        bash holtgrem  R       1:40      1 hpc-cpu-141
 ```
 
 More info with `--long`:
@@ -143,7 +144,7 @@ More info with `--long`:
 ```{.bash code-line-numbers="1|2|3-4"}
 Tue Jul 11 15:21:13 2023
    JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(REASON)
-14629328  training     bash holtgrem  RUNNING       3:20   2:00:00      1 hpc-cpu-141
+14629328  short        bash holtgrem  RUNNING       3:20   2:00:00      1 hpc-cpu-141
 ```
 
 👉 [Slurm Documentation: `squeue`](https://slurm.schedmd.com/squeue.html)
@@ -696,4 +697,8 @@ Your turn 🤸: start `xterm` if you have an local X11 server.
       MaxStartDelay=(null)
   ```
 
-- To use this reservation, add `--reservation=hpc-course` to your `sbatch`/`srun` command line.
+- To use this reservation, add `--reservation=hpc-crash-course` to your `sbatch`/`srun` command line.
+
+## Quiz Time!
+
+- https://PollEv.com​/manuelholtgrewe153
